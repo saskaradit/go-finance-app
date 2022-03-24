@@ -5,15 +5,19 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/saskaradit/finance-app/domain"
+	"github.com/saskaradit/finance-app/service"
 )
 
 func Start() {
 	// mux := http.NewServeMux()
 	router := mux.NewRouter()
-	router.HandleFunc("/greet", greet)
-	router.HandleFunc("/customers", getAllCustomers)
-	router.HandleFunc("/customers", createCustomer).Methods(http.MethodPost)
-	router.HandleFunc("/customers/{customer_id:[0-9]+}", getCustomer)
+
+	// wiring
+	ch := CustomerHandler{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
+
+	// define routes
+	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
 
 	log.Fatal(http.ListenAndServe("localhost:8080", router))
 }
