@@ -2,10 +2,10 @@ package domain
 
 import (
 	"database/sql"
-	"log"
 	"time"
 
 	"github.com/saskaradit/finance-app/errs"
+	"github.com/saskaradit/finance-app/logger"
 )
 
 type CustomerRepositoryDb struct {
@@ -26,7 +26,7 @@ func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError
 
 	if err != nil {
 		errs.NewUnexpectedError("unexpected database error")
-		log.Println("Error while getting customers" + err.Error())
+		logger.Error("Error while getting customers" + err.Error())
 	}
 
 	customers := make([]Customer, 0)
@@ -34,7 +34,7 @@ func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError
 		var c Customer
 		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.DateOfBirth, &c.Status)
 		if err != nil {
-			log.Println("Error while getting customers" + err.Error())
+			logger.Error("Error while getting customers" + err.Error())
 			return nil, errs.NewUnexpectedError("unexpected database error")
 		}
 		customers = append(customers, c)
@@ -51,7 +51,7 @@ func (d CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("Customer not found")
 		} else {
-			log.Println("Error while getting customers" + err.Error())
+			logger.Error("Error while getting customers" + err.Error())
 			return nil, errs.NewUnexpectedError("unexpected database error")
 		}
 	}
